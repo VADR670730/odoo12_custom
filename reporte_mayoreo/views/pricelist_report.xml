@@ -1,0 +1,14 @@
+<odoo>
+  <data>
+      <record id="product_pricelist_report_view" model="ir.ui.view">
+          <field name="name">pricelist.report</field>
+          <field name="model">product.pricelist</field>
+          <field name="inherit_id" ref="product.product_pricelist_view"/>
+          <field name="arch" type="xml">
+              <xpath expr="//field[@name='country_group_ids']" position="before">
+                  <field name="porciento_ganancia"/>
+              </xpath>
+          </field>
+      </record>
+  </data>
+</odoo>
