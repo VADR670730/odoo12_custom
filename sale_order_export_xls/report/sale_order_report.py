@@ -23,30 +23,23 @@ class SalesXlsx(models.AbstractModel):
             worksheet = workbook.add_worksheet('Report')
             bold = workbook.add_format({'bold': True, 'align': 'center'})
             text = workbook.add_format({'font_size': 12, 'align': 'center'})
-            worksheet.set_column(0, 0, 80)
-            worksheet.set_column(1, 2, 25)
-            worksheet.set_column(3, 3, 25)
-            worksheet.set_column(4, 4, 25)
-            worksheet.set_column(5, 5, 25)
-            worksheet.set_column(6, 6, 25)
-            worksheet.set_column(7, 7, 25)
-            worksheet.set_column(8, 8, 25)
-
-
+            worksheet.set_column(0, 0, 60)
             row = 0
             col = 1
             for sale in sale_order:
                 worksheet.write(row, col, sale.name, text)
                 col=col+1
-
             row = 1
             col = 0
             for product in product_ids:
-                worksheet.write(row, col, product.default_code+" "+product.name, text)
+                worksheet.write(row, col, (product.default_code  if product.default_code else "")+" "+product.name, text)
                 for sale in sale_order:
                     col=col+1
                     order_line_ids=self.env['sale.order.line'].search([('id','in',sale.order_line.ids),('product_id','=',product.id)])
                     amount_tax = sum(lines.product_uom_qty for lines in order_line_ids)
-                    worksheet.write(row, col,str(amount_tax), text)
+                    amount_tax=str(int(float(amount_tax)))
+                    if amount_tax=='0':
+                        amount_tax=''
+                    worksheet.write(row, col,amount_tax, text)
                 col = 0
                 row=row+1
