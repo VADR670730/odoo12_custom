@@ -233,17 +233,27 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-8" name="company_address2">
-                        <div t-field="o.company_id.partner_id"
-                             t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": true}'
-                        />
+                    <div class="col-4" name="company_address2">
+                        <div>
+                            <span t-field="o.company_id.name"/>
+                        </div>
+
+                        <span t-field="o.company_id.street"/>
+                        ,
+                        <span t-field="o.company_id.street2"/>                        
+
                     </div>
-                    <div class="col-4" name="contacto">
-                            <div t-field="o.partner_id"
-                                 t-options='{"widget": "contact", "fields": ["address", "name","phone"], "no_marker": True}'/>
-                            <p t-if="o.partner_id.vat"><t t-esc="o.company_id.country_id.vat_label or 'Tax ID'"/>:
-                                <span t-field="o.partner_id.vat"/>
-                            </p>
+                    <div class="col-8" name="contacto">
+                        <div>
+                            <span t-field="o.partner_id.name"/>
+                        </div>
+                        <span t-field="o.partner_id.street"/>
+                        ,
+                        <span t-field="o.partner_id.street2"/>,
+                        <div>
+                            <span t-field="o.partner_id.phone"/>
+                        </div>
+                        
                         <t t-if="o.partner_shipping_id == o.partner_invoice_id
                              and o.partner_invoice_id != o.partner_id
                              or o.partner_shipping_id != o.partner_invoice_id">
@@ -283,8 +293,9 @@
                         <li t-if="o.company_id.website" class="list-inline-item">Web:
                             <span t-field="o.company_id.website"/>
                         </li>
-                        <li t-if="o.company_id.vat" class="list-inline-item"><t
-                                t-esc="(o.company_id.country_id.vat_label or 'Tax ID').replace(' ','\N{NO-BREAK SPACE}')"/>
+                        <li t-if="o.company_id.vat" class="list-inline-item">
+                            <t
+                                    t-esc="(o.company_id.country_id.vat_label or 'Tax ID').replace(' ','\N{NO-BREAK SPACE}')"/>
                             :
                             <span t-esc="o.company_id.vat.replace(' ','\N{NO-BREAK SPACE}')"/>
                         </li>
