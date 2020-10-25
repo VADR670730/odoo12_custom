@@ -103,7 +103,7 @@ class gen_inv(models.TransientModel):
         else:
             if not self.location_id:
                 raise Warning(_('Please Select Location'))
-            fp = tempfile.NamedTemporaryFile(suffix=".xlsx")
+            fp = tempfile.NamedTemporaryFile(suffix=".xlsx",delete=False)
             fp.write(binascii.a2b_base64(self.file))
             fp.seek(0)
             values = {}
@@ -118,17 +118,24 @@ class gen_inv(models.TransientModel):
                 else:
                     line = list(map(lambda row:isinstance(row.value, bytes) and row.value.encode('utf-8') or str(row.value), sheet.row(row_no)))
                     if line:
-                        values.update({'code':line[0],'quantity':line[1]})
+                        values.update({'code':line[3],'quantity':line[10]})
                         if self.import_prod_option == 'barcode':
                             prod_lst = product_obj.search([('barcode',  '=',values['code'])])
+
                         else:
+                            print(values['code'])
+                            if not values['code'].strip():
+                                continue
                             prod_lst = product_obj.search([('default_code', '=',
                                                       values['code'])])
+                            print(prod_lst.name)
+
                         if prod_lst:
                             val['product'] = prod_lst[0].id
                             val['quantity'] = values['quantity']
                         if bool(val):
                             product_uom_id=product_obj.browse(val['product']).uom_id
+                            print(product_uom_id)
                             res = inventory_id.write({
                         'line_ids': [(0, 0, {'product_id':val['product'] , 'location_id' : self.location_id.id, 'product_uom_id' : product_uom_id.id  ,'product_qty': val['quantity']})]})
                         else:
