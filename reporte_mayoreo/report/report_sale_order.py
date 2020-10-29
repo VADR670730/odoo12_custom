@@ -34,7 +34,8 @@ class SalesXlsx(models.AbstractModel):
             worksheet.write('I' + str(hoja), 'Fecha y hora de generacion del reporte', text)
             worksheet.write('B' + str(hoja + 2), 'Periodo del ' +str(obj.fecha_inicio)+' al '+str(obj.fecha_fin), text)
             worksheet.write('A' + str(hoja + 3), 'Ruta:', text)
-            worksheet.write('D' + str(hoja + 4), 'Nombre del vendedor: '+ obj.comercial.name, text)
+            if obj.comercial:
+                worksheet.write('D' + str(hoja + 4), 'Nombre del vendedor: '+ obj.comercial.name, text)
             worksheet.write('E' + str(hoja + 6), 'AREA DE COBRO', text)
             worksheet.write('A' + str(hoja + 7), 'Monto Cobrado incluyendo impuesto sobre ventas:', text)
             worksheet.write('G' + str(hoja + 7), 'Monto cobrado sin Impuestos sobre ventas:', text)
@@ -59,25 +60,31 @@ class SalesXlsx(models.AbstractModel):
             row = hoja + 13
             col = 0
             data = {}
-            total = 0
-            total_con_impuesto=0
+            total = sum([s.amount_untaxed for s in sale_order])
+            total_con_impuesto=sum([s.amount_total for s in sale_order])
+            worksheet.write('B' + str(hoja + 7),str(total_con_impuesto) , text)
+            worksheet.write('H' + str(hoja + 7), str(total), text)
+
             for sale in sale_order:
                 for line in sale.order_line:
-                    data.setdefault(line.product_id.brand_id.id, {'Descripcion': line.product_id.brand_id.name,"Meta Monto":0,"Venta Monto":0, 'A': 0})
+                    data.setdefault(line.product_id.brand_id.id, {'Descripcion': line.product_id.brand_id.name,"Meta Monto":0,"Venta Monto":0, 'A': 0, 'B': 0, 'C': 0, 'D': 0})
                     data[line.product_id.brand_id.id]['Venta Monto'] += line.price_subtotal
                     total += line.price_unit
                     total_con_impuesto += line.price_subtotal
-                    if line.order_id.pricelist_id.name == "A":
+                    if line.price_list_id.name == "A":
                         data[line.product_id.brand_id.id]['A'] += line.price_subtotal
-                    if line.order_id.pricelist_id.name == "B":
+                    if line.price_list_id.name == "B":
                         data[line.product_id.brand_id.id]['B'] += line.price_subtotal
-                    if line.order_id.pricelist_id.name == "C":
+                    if line.price_list_id.name == "C":
                         data[line.product_id.brand_id.id]['C'] += line.price_subtotal
-                    if line.order_id.pricelist_id.name == "D":
+                    if line.price_list_id.name == "D":
                         data[line.product_id.brand_id.id]['D'] += line.price_subtotal
 
             for key,vals in data.items():
                 worksheet.write(row, col, vals['Descripcion'], text)
                 worksheet.write(row, col+2, vals['Venta Monto'], text)
                 worksheet.write(row, col + 3, vals['A'], text)
+                worksheet.write(row, col + 4, vals['B'], text)
+                worksheet.write(row, col + 5, vals['C'], text)
+                worksheet.write(row, col + 6, vals['D'], text)
                 row = row + 1

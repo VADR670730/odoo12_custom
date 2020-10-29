@@ -9,7 +9,7 @@
     'website': "http://www.yourcompany.com",
     'category': 'Uncategorized',
     'version': '0.1',
-    'depends': ['base','sale','report_xlsx'],
+    'depends': ['base','sale','report_xlsx','sol_pricelist'],
 
     'data': [
         # 'security/ir.model.access.csv',
